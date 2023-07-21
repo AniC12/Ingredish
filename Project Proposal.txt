@@ -1,0 +1,17 @@
+Project Proposal:
+
+1. Goal:
+The goal of our recipe finder website is to help users discover and prepare recipes based on the grocery products they have available. By entering their ingredients, users will receive personalized recipe recommendations, making it easier for them to plan meals and reduce food waste.
+
+2. Target Users:
+The primary users of our website will be home cooks, busy professionals, and individuals seeking quick and easy recipe ideas. The demographic will span various age groups, with an emphasis on tech-savvy individuals interested in cooking and exploring new culinary experiences.
+
+3. Data:
+We plan to use a recipe API that contains a diverse collection of recipes. The data should include recipe names, ingredients, instructions, dietary labels (e.g., vegetarian, gluten-free), preparation time, and nutritional information.
+
+4. Approach:
+a. Database Schema: The database schema will include tables for users, recipes, ingredients, and user-submitted ingredients for personalization.
+b. API Issues: Potential API issues may include rate limiting, data accuracy, and potential changes in the API structure or availability.
+c. Sensitive Information: User passwords will be encrypted and secured.
+d. Functionality: Our website will enable users to search for recipes based on ingredients, dietary preferences, and cooking time. Users will also be able to save favorite recipes and create personalized collections. Filter recipes by categories, preparation time, dietary labels.
+e. User Flow: Upon registration/login, users will be prompted to enter their available ingredients. The website will then display recipe suggestions based on the provided ingredients.
