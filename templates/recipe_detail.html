@@ -1,0 +1,24 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+
+<h1>{{ recipe.title }}</h1>
+
+<img class="recipe-image" src="{{ recipe.image }}" alt="{{ recipe.title }} Image">
+<p>{{ recipe.description }}</p>
+
+    <ul>
+        {% for ingredint in recipe.ingredients %}
+        <li>
+            <ul class="list-group list-group-horizontal">
+                <li class="list-group-item">{{ ingredint.product.name }}</li>
+                <li class="list-group-item">{{ ingredint.amount }}</li>
+                <li class="list-group-item">{{ ingredint.unit }}</li>
+            </ul>
+        </li>
+        
+        {% endfor %}
+    </ul>
+<p>Servings {{ recipe.servings }}</p>
+
+{% endblock %}
