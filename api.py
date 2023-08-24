@@ -32,7 +32,6 @@ def get_recipe_details(api_id):
 
             if product is None:            
                 product = Product()
-                product.image = json_ingredient.get('image')
                 product.name = json_ingredient.get('name')
             
             ingredient = Ingredient()
@@ -52,9 +51,18 @@ def get_recipes(query):
         )
     if response.status_code == 200:
         recipes_data = response.json()
-        print(recipes_data)
         list_of_recipes = recipes_data.get('results')
     else:
         list_of_recipes = []
 
     return list_of_recipes
+
+def get_recipes_pantry(pantry_items):
+
+    response = requests.get(
+            f'https://api.spoonacular.com/recipes/findByIngredients?apiKey={MY_KEY}&ingredients={",".join(pantry_items)}'
+        )
+    
+    if response.status_code == 200:
+        return response.json()
+    return []

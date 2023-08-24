@@ -1,9 +1,13 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from models import db, connect_db, User, Recipe, Product, Ingredient, Favorite, Pantry
 from forms import UserSignUpForm, UserLoginForm, SearchForm
-from api import get_random_recipes, get_recipe_details, get_recipes
+from api import get_random_recipes, get_recipe_details, get_recipes, get_recipes_pantry
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_login import login_required, login_user, logout_user, LoginManager
 from sqlalchemy.exc import IntegrityError
+from werkzeug.urls import url_encode
+
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://bloglyuser:bloglypassword@localhost/ingredish'
@@ -16,6 +20,12 @@ connect_db(app)
 app.config['SECRET_KEY'] = "SECRET!"
 debug = DebugToolbarExtension(app)
 
+login_manager = LoginManager(app)
+login_manager.login_view = 'show_login_form'
+
+@login_manager.user_loader
+def get_user(id):
+  return User.query.get(int(id))
 
 @app.route("/")
 def show_home_page():
@@ -49,7 +59,8 @@ def signup_user():
     except IntegrityError:
         form.username.errors.append('Username taken.  Please pick another')
         return render_template('register.html', form=form)
-    session['username'] = new_user.username
+    session['userid'] = new_user.id
+    login_user(new_user)
     flash('Welcome! Successfully Created Your Account!', "success")
     
     return redirect('/')
@@ -61,7 +72,7 @@ def show_login_form():
     return render_template('login.html', form=form)
     
 @app.route('/login', methods=['POST'])
-def login_user():
+def login():
     form = UserLoginForm()
 
     username = form.username.data
@@ -69,7 +80,8 @@ def login_user():
     user = User.authenticate(username, password)
     if user:
         flash(f"Welcome Back, {user.username}!", "primary")
-        session['username'] = user.username
+        login_user(user)
+        session['userid'] = user.id
         return redirect('/')
     else:
         form.username.errors = ['Invalid username/password.']
@@ -78,17 +90,17 @@ def login_user():
 
 
 @app.route('/logout')
-def logout_user():
-    session.pop('username')
+def logout():
+    session.pop('userid')
+    logout_user()
     flash("Goodbye!", "info")
     return redirect('/')
 
 @app.route('/recipe/<string:api_id>')
 def show_recipe(api_id):
     recipe = Recipe.query.filter_by(api_id=api_id).first()
-
     if recipe:
-        return render_template('recipe_detail.html', recipe=recipe)
+        return render_template('recipe_detail.html', recipe=recipe, fav=Favorite.check_favorite(recipe.id))
     
     recipe = get_recipe_details(api_id)
 
@@ -98,7 +110,7 @@ def show_recipe(api_id):
     db.session.add(recipe)
     db.session.commit()
 
-    return render_template('recipe_detail.html', recipe=recipe)
+    return render_template('recipe_detail.html', recipe=recipe, fav=Favorite.check_favorite(recipe.id))
 
 
 @app.route('/search', methods=['POST'])
@@ -119,3 +131,92 @@ def show_search_page():
     list_of_recipes = session.get('recipes')
 
     return render_template('search_page.html', recipes=list_of_recipes, search_text=query)
+
+
+@app.route('/favorite/<int:recipe_id>', methods=['POST'])
+@login_required
+def toggle_favorite(recipe_id):
+    user = User.query.get(session.get('userid'))  # Get the current logged-in user
+
+    favorite_recipe = Favorite.query.filter_by(user_id=user.id, recipe_id=recipe_id).first()
+    if favorite_recipe is None:
+        new_favorite = Favorite(user_id=user.id, recipe_id=recipe_id)
+        db.session.add(new_favorite)
+        db.session.commit()
+
+    return "Ok"
+
+@app.route('/unfavorite/<int:recipe_id>', methods=['POST'])
+@login_required
+def untoggle_favorite(recipe_id):
+    user = User.query.get(session.get('userid'))  # Get the current logged-in user
+
+    favorite_recipe = Favorite.query.filter_by(user_id=user.id, recipe_id=recipe_id).first()
+    if favorite_recipe:
+        db.session.delete(favorite_recipe)
+        db.session.commit()
+
+    return "Ok"
+
+@app.route('/favorites')
+@login_required
+def show_favorites():
+    user = User.query.get(session.get('userid'))
+
+    user_favorite_recipe_ids = [favorite.recipe_id for favorite in user.favorite_recipes]
+    favorite_recipes = Recipe.query.filter(Recipe.id.in_(user_favorite_recipe_ids)).all()
+
+    return render_template('favorites.html', recipes=favorite_recipes)
+
+@app.route('/pantry')
+@login_required
+def show_pantry():
+    user = User.query.get(session.get('userid'))
+
+    pantry_items = user.pantry_items
+
+    return render_template('pantry.html', pantry_items=pantry_items)
+
+@app.route('/pantry', methods=['POST'])
+@login_required
+def add_to_pantry():
+    user = User.query.get(session.get('userid'))
+    item_name = request.form.get('item_name')
+    
+    product = Product.query.filter_by(name=item_name).first()
+    
+    if product is None:            
+        product = Product()
+        product.name = item_name
+        db.session.add(product)
+        db.session.commit()
+    
+
+    new_item = Pantry(user_id=user.id, product_id=product.id)
+    db.session.add(new_item)
+    db.session.commit()
+
+    pantry_items = user.pantry_items
+    return render_template('pantry.html', pantry_items=pantry_items)
+
+@app.route('/remove_pantry/<int:item_id>', methods=['POST'])
+@login_required
+def remove_pantry(item_id):
+    user = User.query.get(session.get('userid'))
+    item_to_remove = Pantry.query.get(item_id)
+
+    if item_to_remove and item_to_remove.user_id == user.id:
+        db.session.delete(item_to_remove)
+        db.session.commit()
+
+    return redirect('/pantry')
+
+@app.route('/search_with_pantry', methods=['POST'])
+@login_required
+def search_with_pantry():
+    user = User.query.get(session.get('userid'))
+    pantry_items = [item.product.name for item in user.pantry_items]
+
+    list_of_recipes = get_recipes_pantry(pantry_items)
+
+    return render_template('pantry_results.html', recipes=list_of_recipes)

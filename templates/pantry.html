@@ -1,0 +1,31 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+
+<h1>
+    My Pantry
+</h1>
+
+<div>
+    <form action="{{ url_for('show_pantry') }}" method="POST">
+        <input type="text" name="item_name" placeholder="Add item to pantry">
+        <button type="submit">Add</button>
+    </form>
+    <ul>
+        {% for item in pantry_items %}
+        <li>
+            {{ item.product.name }}
+            <form action="{{ url_for('remove_pantry', item_id=item.id) }}" method="POST">
+                <button type="submit">X</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('search_with_pantry') }}" method="POST">
+        <button class="btn btn-outline-success" type="submit">Search with Pantry</button>
+    </form>
+    
+</div>
+
+{% endblock %}

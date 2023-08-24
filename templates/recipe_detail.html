@@ -2,7 +2,14 @@
 
 {% block content %}
 
-<h1>{{ recipe.title }}</h1>
+<h1>
+    {{ recipe.title }}
+    {% if fav=="2" %}
+        <span class="fa fa-star checked" data-recipe-id="{{ recipe.id }}"></span>
+    {% elif  fav=="1"%}
+        <span class="fa fa-star" data-recipe-id="{{ recipe.id }}"></span>
+    {% endif %}
+</h1>
 
 <img class="recipe-image" src="{{ recipe.image }}" alt="{{ recipe.title }} Image">
 <p>{{ recipe.description }}</p>

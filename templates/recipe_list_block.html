@@ -1,0 +1,18 @@
+<div>
+    <ul>
+        {% for recipe in recipes %}
+            <li>
+                <img src="{{ recipe.image }}" class="img-thumbnail" alt="{{ recipe.title }} Image">
+                <h4>
+                    <a href="/recipe/{{recipe.id}}">{{ recipe.title }}</a>
+                    {% if fav=="2" %}
+                    <span class="fa fa-star checked" data-recipe-id="{{ recipe.id }}"></span>
+                    {% elif  fav=="1"%}
+                    <span class="fa fa-star" data-recipe-id="{{ recipe.id }}"></span>
+                    {% endif %}
+                </h4>
+                
+            </li>
+        {% endfor %}
+    </ul>
+</div>

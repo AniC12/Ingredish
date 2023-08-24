@@ -1,0 +1,22 @@
+{% extends 'base.html'  %}
+
+{% block content %}
+
+<h1>Favorite Recipes</h1>
+
+<div>
+    <ul>
+        {% for recipe in recipes %}
+            <li>
+                <img src="{{ recipe.image }}" class="img-thumbnail" alt="{{ recipe.title }} Image">
+                <h4>
+                    <a href="/recipe/{{recipe.id}}">{{ recipe.title }}</a>
+                    <span class="fa fa-star checked" data-recipe-id="{{ recipe.id }}"></span>
+                </h4>
+                
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
