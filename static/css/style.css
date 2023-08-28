@@ -1,3 +1,40 @@
 .checked {
     color: orange;
   }
+
+li {
+  list-style-type: none;
+}
+
+h1, h4 {
+  font-weight: bold;
+}
+
+.navbar {
+  background-color: #18bc9c;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+}
+
+.recipe-description {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: medium
+}
+
+.recipe-image {
+  margin-bottom: 1rem;
+}
+
+.input-group {
+  width: 30%;
+}
+
+.btn-outline-danger {
+  border-style: none;
+}
+
+.pantry_item {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  font-weight: bold;
+}
