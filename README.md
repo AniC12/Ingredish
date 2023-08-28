@@ -2,7 +2,7 @@
 # Ingredish - Recipe Search and Pantry Management Web Application
 
 
-##Project Overview##
+## Project Overview ##
 
 
 - **URL: My Deployed URL**
@@ -10,10 +10,10 @@
 
 - **GitHub Repository: [https://github.com/AniC12/ingredish](https://github.com/AniC12/ingredish)**
 
-##Description##
+## Description ##
 Ingredish is a web application that allows users to search for recipes, manage their pantry items, and find recipes based on the ingredients available in their pantry. Users can create an account, log in, and access a variety of features to make their cooking experience more convenient and enjoyable.
 
-##Features Implemented##
+## Features Implemented ##
 
 
 
