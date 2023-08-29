@@ -11,14 +11,14 @@ import os
 
 app = Flask(__name__)
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://bloglyuser:bloglypassword@localhost/ingredish'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.gentenv("DATABASE_URL")
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 connect_db(app)
 
-app.config['SECRET_KEY'] = os.gentenv("SECRET_KEY")
+app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
 debug = DebugToolbarExtension(app)
 
 login_manager = LoginManager(app)
