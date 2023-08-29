@@ -5,7 +5,7 @@
 ## Project Overview ##
 
 
-- **URL: My Deployed URL**
+- **URL: [https://ingredish-web-service.onrender.com/](https://ingredish-web-service.onrender.com/)**
 
 
 - **GitHub Repository: [https://github.com/AniC12/ingredish](https://github.com/AniC12/ingredish)**
