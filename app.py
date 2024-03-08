@@ -5,13 +5,15 @@ from api import get_random_recipes, get_recipe_details, get_recipes, get_recipes
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import login_required, login_user, logout_user, LoginManager
 from sqlalchemy.exc import IntegrityError
-from werkzeug.urls import url_encode
 import os
 
 
 app = Flask(__name__)
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://bloglyuser:bloglypassword@localhost/ingredish'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+if os.getenv("DATABASE_URL"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://superdb:superdbpassword@127.0.0.1/ingredish'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -68,7 +70,7 @@ def signup_user():
         db.session.commit()
     except IntegrityError:
         form.username.errors.append('Username taken.  Please pick another')
-        return render_template('register.html', form=form)
+        return render_template('signup.html', form=form)
     session['userid'] = new_user.id
     login_user(new_user)
     flash('Welcome! Successfully Created Your Account!', "success")
@@ -211,8 +213,7 @@ def add_to_pantry():
         product.name = item_name
         db.session.add(product)
 
-    new_item = Pantry(user_id=user.id, product_id=product.id)
-    item = Pantry.query.filter_by(product_id=product.id).first()
+    item = Pantry.query.filter_by(product_id=product.id, user_id=user.id).first()
 
     if item is None:
         new_item = Pantry(user_id=user.id, product_id=product.id)
